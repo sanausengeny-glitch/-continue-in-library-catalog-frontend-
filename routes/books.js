@@ -1,157 +1,140 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const Book = require('../models/Book');
+const { books, genres } = require('../lib/catalogData');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { validateBook } = require('../middleware/validate');
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
-  try {
-    const { genre, search, page = '1', limit = '10' } = req.query;
-    const filters = {};
+const serializeBook = (book) => {
+  const matchingGenre = genres.find((genre) => genre._id === book.genre) || null;
 
-    if (genre) {
-      if (!mongoose.Types.ObjectId.isValid(String(genre))) {
-        const error = new Error('genre must be a valid Mongo ObjectId.');
-        error.statusCode = 400;
-        throw error;
-      }
+  return {
+    ...book,
+    genre: matchingGenre
+      ? { _id: matchingGenre._id, name: matchingGenre.name, slug: matchingGenre.slug }
+      : null,
+  };
+};
 
-      filters.genre = new mongoose.Types.ObjectId(String(genre));
-    }
+router.get('/', (req, res) => {
+  const { genre, search, page = '1', limit = '10' } = req.query;
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
 
-    if (search && String(search).trim()) {
-      const trimmedSearch = String(search).trim();
-      filters.$or = [
-        { title: { $regex: trimmedSearch, $options: 'i' } },
-        { author: { $regex: trimmedSearch, $options: 'i' } },
-      ];
-    }
-
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
-
-    if (!Number.isInteger(pageNumber) || pageNumber < 1) {
-      const error = new Error('page must be a positive integer.');
-      error.statusCode = 400;
-      throw error;
-    }
-
-    if (!Number.isInteger(limitNumber) || limitNumber < 1) {
-      const error = new Error('limit must be a positive integer.');
-      error.statusCode = 400;
-      throw error;
-    }
-
-    const totalBooks = await Book.countDocuments(filters);
-    const totalPages = totalBooks === 0 ? 0 : Math.ceil(totalBooks / limitNumber);
-
-    const books = await Book.find(filters)
-      .populate('genre', 'name slug')
-      .sort({ title: 1 })
-      .skip((pageNumber - 1) * limitNumber)
-      .limit(limitNumber);
-
-    res.json({
-      success: true,
-      data: books,
-      pagination: {
-        page: pageNumber,
-        limit: limitNumber,
-        total: totalBooks,
-        totalPages,
-      },
+  if (!Number.isInteger(pageNumber) || pageNumber < 1) {
+    return res.status(400).json({
+      success: false,
+      error: { message: 'page must be a positive integer.' },
     });
-  } catch (error) {
-    next(error);
   }
+
+  if (!Number.isInteger(limitNumber) || limitNumber < 1) {
+    return res.status(400).json({
+      success: false,
+      error: { message: 'limit must be a positive integer.' },
+    });
+  }
+
+  let filteredBooks = [...books];
+
+  if (genre) {
+    filteredBooks = filteredBooks.filter((book) => String(book.genre) === String(genre));
+  }
+
+  if (search && String(search).trim()) {
+    const term = String(search).trim().toLowerCase();
+    filteredBooks = filteredBooks.filter((book) => {
+      const title = (book.title || '').toLowerCase();
+      const author = (book.author || '').toLowerCase();
+      return title.includes(term) || author.includes(term);
+    });
+  }
+
+  const total = filteredBooks.length;
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limitNumber);
+  const start = (pageNumber - 1) * limitNumber;
+  const pagedBooks = filteredBooks.slice(start, start + limitNumber);
+
+  return res.json({
+    success: true,
+    data: pagedBooks.map(serializeBook),
+    pagination: {
+      page: pageNumber,
+      limit: limitNumber,
+      total,
+      totalPages,
+    },
+  });
 });
 
-router.get('/:id', async (req, res, next) => {
-  try {
-    const { id } = req.params;
+router.get('/:id', (req, res) => {
+  const book = books.find((entry) => entry._id === req.params.id);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      const error = new Error('Book id must be a valid Mongo ObjectId.');
-      error.statusCode = 400;
-      return next(error);
-    }
-
-    const book = await Book.findById(id).populate('genre', 'name slug');
-
-    if (!book) {
-      const error = new Error('Book not found.');
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.json({ success: true, data: book });
-  } catch (error) {
-    next(error);
+  if (!book) {
+    return res.status(404).json({
+      success: false,
+      error: { message: 'Book not found.' },
+    });
   }
+
+  return res.json({ success: true, data: serializeBook(book) });
 });
 
-router.post('/', requireAuth, requireRole('librarian'), validateBook, async (req, res, next) => {
-  try {
-    const book = await Book.create(req.body);
-    const populatedBook = await Book.findById(book._id).populate('genre', 'name slug');
+router.post('/', requireAuth, requireRole('librarian'), validateBook, (req, res) => {
+  const nextId = `book-${Date.now()}`;
+  const newBook = {
+    _id: nextId,
+    title: req.body.title.trim(),
+    author: req.body.author.trim(),
+    isbn: req.body.isbn.trim(),
+    description: req.body.description.trim(),
+    coverImage: req.body.coverImage.trim(),
+    totalCopies: Number(req.body.totalCopies),
+    availableCopies: Number(req.body.availableCopies),
+    genre: req.body.genre,
+  };
 
-    res.status(201).json({ success: true, data: populatedBook });
-  } catch (error) {
-    next(error);
-  }
+  books.push(newBook);
+  return res.status(201).json({ success: true, data: serializeBook(newBook) });
 });
 
-router.put('/:id', requireAuth, requireRole('librarian'), validateBook, async (req, res, next) => {
-  try {
-    const { id } = req.params;
+router.put('/:id', requireAuth, requireRole('librarian'), validateBook, (req, res) => {
+  const index = books.findIndex((book) => book._id === req.params.id);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      const error = new Error('Book id must be a valid Mongo ObjectId.');
-      error.statusCode = 400;
-      return next(error);
-    }
-
-    const book = await Book.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    }).populate('genre', 'name slug');
-
-    if (!book) {
-      const error = new Error('Book not found.');
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.json({ success: true, data: book });
-  } catch (error) {
-    next(error);
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      error: { message: 'Book not found.' },
+    });
   }
+
+  books[index] = {
+    ...books[index],
+    title: req.body.title.trim(),
+    author: req.body.author.trim(),
+    isbn: req.body.isbn.trim(),
+    description: req.body.description.trim(),
+    coverImage: req.body.coverImage.trim(),
+    totalCopies: Number(req.body.totalCopies),
+    availableCopies: Number(req.body.availableCopies),
+    genre: req.body.genre,
+  };
+
+  return res.json({ success: true, data: serializeBook(books[index]) });
 });
 
-router.delete('/:id', requireAuth, requireRole('librarian'), async (req, res, next) => {
-  try {
-    const { id } = req.params;
+router.delete('/:id', requireAuth, requireRole('librarian'), (req, res) => {
+  const index = books.findIndex((book) => book._id === req.params.id);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      const error = new Error('Book id must be a valid Mongo ObjectId.');
-      error.statusCode = 400;
-      return next(error);
-    }
-
-    const book = await Book.findByIdAndDelete(id);
-
-    if (!book) {
-      const error = new Error('Book not found.');
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.status(204).send();
-  } catch (error) {
-    next(error);
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      error: { message: 'Book not found.' },
+    });
   }
+
+  books.splice(index, 1);
+  return res.status(204).send();
 });
 
 module.exports = router;

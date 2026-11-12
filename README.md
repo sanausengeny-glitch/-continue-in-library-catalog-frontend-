@@ -1,5 +1,31 @@
 <<<<<<< HEAD
 # library-catalog-service-Week-3-Assignment
+
+## Frontend catalog app
+
+This project also includes a React frontend under the `client/` folder for the week 4 assignment. It consumes the API from this repo, supports genre filters, debounced searching, empty/loading/error states, and a detail page for each book.
+
+### Frontend setup
+
+1. From the backend repo, start the API:
+   ```bash
+   npm install
+   npm start
+   ```
+2. In a second terminal, run the frontend:
+   ```bash
+   cd client
+   npm install
+   npm run dev -- --host 0.0.0.0
+   ```
+3. Open the URL printed by Vite (usually `http://localhost:5173`).
+
+### Demo
+
+[Library Catalog Demo GIF](https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif)
+
+The demo covers browsing, genre filtering, live search, and opening a book detail page.
+
 =======
 # Library Catalog Service
 
