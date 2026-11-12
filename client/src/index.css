@@ -301,10 +301,237 @@ img {
   font-size: 1.02rem;
 }
 
+.site-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 20px 12px;
+}
+
+.site-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.site-nav__link,
+.nav-action,
+.reading-toggle,
+.primary-button,
+.booking-form button,
+.reading-list__items button {
+  border: none;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.site-nav__link,
+.nav-action {
+  background: rgba(17, 27, 40, 0.85);
+  color: #edf3ff;
+  border: 1px solid rgba(167, 180, 255, 0.2);
+  padding: 9px 14px;
+}
+
+.site-nav__link.active {
+  background: linear-gradient(135deg, #7a8cff, #5de5d1);
+  color: #09111a;
+  border-color: transparent;
+}
+
+.user-badge {
+  color: #dfe7ff;
+  font-weight: 600;
+}
+
+.catalog-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.catalog-main {
+  min-width: 0;
+}
+
+.book-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.book-card__link {
+  display: block;
+  flex: 1;
+}
+
+.book-card__actions {
+  padding: 0 16px 16px;
+}
+
+.reading-toggle,
+.primary-button,
+.booking-form button {
+  background: linear-gradient(135deg, #7a8cff, #5de5d1);
+  color: #09111a;
+  padding: 10px 16px;
+}
+
+.reading-toggle--saved {
+  background: rgba(17, 27, 40, 0.85);
+  border: 1px solid rgba(167, 180, 255, 0.2);
+  color: #edf3ff;
+}
+
+.reading-list {
+  background: rgba(13, 21, 30, 0.82);
+  border: 1px solid rgba(167, 180, 255, 0.14);
+  border-radius: 18px;
+  padding: 18px;
+  min-height: 200px;
+}
+
+.reading-list h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.reading-list__empty {
+  margin: 0;
+  color: #c8d5f5;
+}
+
+.reading-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.reading-list__items li {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(17, 27, 40, 0.75);
+}
+
+.reading-list__items button {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #edf3ff;
+  padding: 7px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 90px);
+}
+
+.auth-card,
+.booking-panel {
+  width: min(100%, 520px);
+  background: rgba(13, 21, 30, 0.82);
+  border: 1px solid rgba(167, 180, 255, 0.14);
+  border-radius: 24px;
+  padding: 28px 24px;
+}
+
+.auth-card h1 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.auth-form,
+.booking-form {
+  display: grid;
+  gap: 18px;
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+}
+
+.field-group label {
+  color: #bfd0f7;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.field-group input,
+.field-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(167, 180, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(17, 27, 40, 0.9);
+  color: #f5f7ff;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-error {
+  margin: 0;
+  color: #ffd5d5;
+  font-weight: 600;
+}
+
+.auth-switch {
+  margin: 18px 0 0;
+  color: #dfe7ff;
+  text-align: center;
+}
+
+.auth-switch a {
+  color: #8fb2ff;
+}
+
+.booking-panel {
+  width: min(100%, 640px);
+}
+
+.booking-success {
+  margin: 0;
+  color: #c9ffd7;
+  font-weight: 600;
+}
+
 @media (max-width: 700px) {
   .page-shell {
     padding-left: 14px;
     padding-right: 14px;
+  }
+
+  .site-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 12px;
+  }
+
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
   }
 
   .book-detail {

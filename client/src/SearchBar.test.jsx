@@ -1,26 +1,28 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import SearchBar from './components/SearchBar';
 
 describe('SearchBar', () => {
-  it('debounces the search callback', async () => {
-    const onSearch = vi.fn();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-
+  it('debounces the search callback', () => {
     vi.useFakeTimers();
 
-    render(<SearchBar value="" onSearch={onSearch} />);
+    try {
+      const onSearch = vi.fn();
 
-    const input = screen.getByPlaceholderText(/search books/i);
-    await user.type(input, 'dune');
+      render(<SearchBar value="" onSearch={onSearch} />);
 
-    expect(onSearch).not.toHaveBeenCalled();
+      const input = screen.getByPlaceholderText(/search books/i);
+      fireEvent.change(input, { target: { value: 'dune' } });
 
-    vi.advanceTimersByTime(400);
+      expect(onSearch).not.toHaveBeenCalled();
 
-    expect(onSearch).toHaveBeenCalledWith('dune');
+      act(() => {
+        vi.advanceTimersByTime(400);
+      });
 
-    vi.useRealTimers();
+      expect(onSearch).toHaveBeenCalledWith('dune');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

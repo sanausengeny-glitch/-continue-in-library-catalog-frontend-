@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function SearchBar({ value, onSearch }) {
   const [query, setQuery] = useState(value);
+  const hasInteracted = useRef(false);
 
   useEffect(() => {
     setQuery(value);
   }, [value]);
 
   useEffect(() => {
+    if (!hasInteracted.current) {
+      return undefined;
+    }
+
     const timer = setTimeout(() => {
       onSearch(query.trim());
     }, 400);
@@ -23,7 +28,10 @@ export default function SearchBar({ value, onSearch }) {
         type="search"
         value={query}
         placeholder="Search books"
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => {
+          hasInteracted.current = true;
+          setQuery(event.target.value);
+        }}
       />
     </label>
   );

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import BookCard from '../components/BookCard';
 import GenreFilter from '../components/GenreFilter';
+import ReadingListPanel from '../components/ReadingListPanel';
 import SearchBar from '../components/SearchBar';
 import useBooks from '../hooks/useBooks';
 
@@ -54,39 +55,45 @@ export default function CatalogPage() {
         />
       </section>
 
-      {loading ? (
-        <div className="state state--loading">Loading books…</div>
-      ) : error ? (
-        <div className="state state--error">{error}</div>
-      ) : books.length === 0 ? (
-        <div className="state state--empty">{emptyMessage}</div>
-      ) : (
-        <>
-          <section className="catalog-grid" aria-live="polite">
-            {books.map((book) => (
-              <BookCard key={book._id} book={book} />
-            ))}
-          </section>
+      <div className="catalog-layout">
+        <div className="catalog-main">
+          {loading ? (
+            <div className="state state--loading">Loading books…</div>
+          ) : error ? (
+            <div className="state state--error">{error}</div>
+          ) : books.length === 0 ? (
+            <div className="state state--empty">{emptyMessage}</div>
+          ) : (
+            <>
+              <section className="catalog-grid" aria-live="polite">
+                {books.map((book) => (
+                  <BookCard key={book._id} book={book} />
+                ))}
+              </section>
 
-          {pagination.totalPages > 1 && (
-            <div className="pagination" aria-label="Book pagination">
-              <button type="button" disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
-                Previous
-              </button>
-              <span>
-                Page {page} of {pagination.totalPages}
-              </span>
-              <button
-                type="button"
-                disabled={page >= pagination.totalPages}
-                onClick={() => setPage((current) => Math.min(pagination.totalPages, current + 1))}
-              >
-                Next
-              </button>
-            </div>
+              {pagination.totalPages > 1 && (
+                <div className="pagination" aria-label="Book pagination">
+                  <button type="button" disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
+                    Previous
+                  </button>
+                  <span>
+                    Page {page} of {pagination.totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={page >= pagination.totalPages}
+                    onClick={() => setPage((current) => Math.min(pagination.totalPages, current + 1))}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+
+        <ReadingListPanel />
+      </div>
     </main>
   );
 }

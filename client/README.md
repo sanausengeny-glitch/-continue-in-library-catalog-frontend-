@@ -28,6 +28,10 @@ The catalog uses the backend's `?genre=` and `?search=` query parameters togethe
 
 This demo shows: browse catalog → select a genre → search for a title/author → open a book detail page.
 
+## Persistence strategy
+
+The reading list uses browser localStorage instead of a backend sync. This is the best fit for a lightweight patron-side wishlist because the list is a user preference that should survive a page refresh without requiring an API call for every add/remove action. Keeping it client-side also keeps the app fast and reduces server-side write churn while still making the list durable across refreshes.
+
 ## Assignment checklist
 
 - Responsive catalog grid: yes
@@ -35,3 +39,6 @@ This demo shows: browse catalog → select a genre → search for a title/author
 - Genre + search combination: yes
 - Loading, error, and empty states: yes
 - Detail page handles missing/invalid ids gracefully: yes
+- Reading list persists across refreshes with localStorage: yes
+- Auth login/register flow works against the real backend API: yes
+- Booking page is protected and redirects unauthenticated users to login: yes
