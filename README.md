@@ -1,4 +1,4 @@
-# Library Catalog Service
+# Library Catalog Service Backend and Frontend Admin Pages
 
 This project provides a React catalog and an Express API for library books, borrowing, and space reservations.
 
