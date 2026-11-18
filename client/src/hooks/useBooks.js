@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiUrl } from '../lib/api';
 
 export default function useBooks({ genre = '', search = '', page = 1, limit = 12 } = {}) {
   const [books, setBooks] = useState([]);
@@ -23,7 +24,7 @@ export default function useBooks({ genre = '', search = '', page = 1, limit = 12
     setLoading(true);
     setError('');
 
-    fetch(`/books?${params.toString()}`, { signal: controller.signal })
+    fetch(apiUrl(`/books?${params.toString()}`), { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));

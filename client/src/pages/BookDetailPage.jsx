@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { apiUrl } from '../lib/api';
 
 export default function BookDetailPage() {
   const { id } = useParams();
@@ -16,7 +17,7 @@ export default function BookDetailPage() {
 
     const controller = new AbortController();
 
-    fetch(`/books/${id}`, { signal: controller.signal })
+    fetch(apiUrl(`/books/${id}`), { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));

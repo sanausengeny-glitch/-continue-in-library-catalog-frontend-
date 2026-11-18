@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import SearchBar from './components/SearchBar';
+import SearchBar from '../SearchBar';
 
 describe('SearchBar', () => {
   it('debounces the search callback', () => {

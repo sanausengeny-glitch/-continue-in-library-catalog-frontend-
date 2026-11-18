@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const BorrowRequest = require('../models/BorrowRequest');
 const Book = require('../models/Book');
 const { requireAuth, requireRole } = require('../middleware/auth');
+const calculateFine = require('../lib/calculateFine');
 
 const router = express.Router();
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
-const DAILY_FINE = 0.25;
 const LOAN_PERIOD_DAYS = 14;
 const statuses = ['pending', 'approved', 'returned', 'late'];
 
@@ -87,9 +87,8 @@ router.patch('/:id', requireAuth, requireRole('librarian'), async (req, res, nex
     borrowRequest.status = status;
     if (status === 'returned') {
       const returnedAt = new Date();
-      const overdueDays = Math.max(0, Math.ceil((returnedAt.getTime() - borrowRequest.dueAt.getTime()) / DAY_IN_MS));
       borrowRequest.returnedAt = returnedAt;
-      borrowRequest.fine = Math.round(overdueDays * DAILY_FINE * 100) / 100;
+      borrowRequest.fine = calculateFine(borrowRequest.dueAt, returnedAt);
     } else {
       borrowRequest.returnedAt = null;
       borrowRequest.fine = 0;

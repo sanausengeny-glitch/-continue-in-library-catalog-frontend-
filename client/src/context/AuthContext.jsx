@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { apiUrl } from '../lib/api';
 
 const TOKEN_KEY = 'libraryCatalogToken';
 const USER_KEY = 'libraryCatalogUser';
@@ -51,7 +52,7 @@ export function AuthProvider({ children }) {
 
     setToken(storedToken);
 
-    fetch('/api/users/profile', {
+    fetch(apiUrl('/api/users/profile'), {
       headers: {
         Authorization: `Bearer ${storedToken}`,
       },
@@ -83,7 +84,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(apiUrl('/api/auth/login'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -116,7 +117,7 @@ export function AuthProvider({ children }) {
   };
 
   const register = async ({ username, email, password }) => {
-    const response = await fetch('/api/auth/register', {
+    const response = await fetch(apiUrl('/api/auth/register'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -153,7 +154,7 @@ export function AuthProvider({ children }) {
 
     if (activeToken) {
       try {
-        await fetch('/api/auth/logout', {
+        await fetch(apiUrl('/api/auth/logout'), {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${activeToken}`,

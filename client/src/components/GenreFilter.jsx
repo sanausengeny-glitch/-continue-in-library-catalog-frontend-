@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiUrl } from '../lib/api';
 
 export default function GenreFilter({ selectedGenre, onSelect }) {
   const [genres, setGenres] = useState([]);
@@ -8,7 +9,7 @@ export default function GenreFilter({ selectedGenre, onSelect }) {
   useEffect(() => {
     let ignore = false;
 
-    fetch('/genres')
+    fetch(apiUrl('/genres'))
       .then(async (response) => {
         if (!response.ok) {
           throw new Error('Unable to load genres.');

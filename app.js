@@ -10,9 +10,25 @@ const borrowRequestRoutes = require('./routes/borrowRequests');
 const bookingRoutes = require('./routes/bookings');
 
 const app = express();
+const frontendOrigin = process.env.FRONTEND_ORIGIN?.replace(/\/+$/, '');
 
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
+app.use((req, res, next) => {
+  const origin = req.get('Origin');
+  if (frontendOrigin) {
+    res.vary('Origin');
+  }
+  if (origin && frontendOrigin && origin === frontendOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', frontendOrigin);
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  }
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  return next();
+});
 
 app.get('/health', (req, res) => {
   res.json({ success: true, message: 'API is running.' });

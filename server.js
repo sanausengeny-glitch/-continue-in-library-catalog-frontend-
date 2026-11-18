@@ -6,15 +6,17 @@ const app = require('./app');
 const port = Number(process.env.PORT || 3000);
 
 const startServer = async () => {
-  if (process.env.MONGODB_URI) {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI);
-      console.log('Connected to MongoDB.');
-    } catch (error) {
-      console.warn('MongoDB connection failed; running in local in-memory catalog mode.');
+  if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET must be configured in production.');
+  }
+  if (!process.env.MONGODB_URI) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('MONGODB_URI must be configured in production.');
     }
-  } else {
     console.warn('MONGODB_URI not set; running in local in-memory catalog mode.');
+  } else {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB.');
   }
 
   app.listen(port, () => {
@@ -22,4 +24,7 @@ const startServer = async () => {
   });
 };
 
-startServer();
+startServer().catch((error) => {
+  console.error('Failed to start the library catalog API.', error);
+  process.exitCode = 1;
+});
