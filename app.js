@@ -6,6 +6,8 @@ const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const genreRoutes = require('./routes/genres');
 const bookRoutes = require('./routes/books');
+const borrowRequestRoutes = require('./routes/borrowRequests');
+const bookingRoutes = require('./routes/bookings');
 
 const app = express();
 
@@ -18,6 +20,10 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/borrow-requests', borrowRequestRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/books', bookRoutes);
+app.use('/api/genres', genreRoutes);
 app.use('/genres', genreRoutes);
 app.use('/books', bookRoutes);
 

@@ -7,6 +7,9 @@ import CatalogPage from './pages/CatalogPage';
 import BookDetailPage from './pages/BookDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AdminBooksPage from './pages/admin/AdminBooksPage';
+import AdminBorrowRequestsPage from './pages/admin/AdminBorrowRequestsPage';
+import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 
 function AppShell() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -17,6 +20,13 @@ function AppShell() {
         <div className="site-nav__links">
           <NavLink className="site-nav__link" to="/">Catalog</NavLink>
           <NavLink className="site-nav__link" to="/booking">Booking</NavLink>
+          {user?.role === 'librarian' && (
+            <>
+              <NavLink className="site-nav__link" to="/admin/books">Admin books</NavLink>
+              <NavLink className="site-nav__link" to="/admin/borrow-requests">Borrow requests</NavLink>
+              <NavLink className="site-nav__link" to="/admin/bookings">Bookings</NavLink>
+            </>
+          )}
         </div>
 
         <div className="site-nav__links site-nav__links--end">
@@ -47,6 +57,9 @@ function AppShell() {
             </ProtectedRoute>
           }
         />
+        <Route path="/admin/books" element={<ProtectedRoute role="librarian"><AdminBooksPage /></ProtectedRoute>} />
+        <Route path="/admin/borrow-requests" element={<ProtectedRoute role="librarian"><AdminBorrowRequestsPage /></ProtectedRoute>} />
+        <Route path="/admin/bookings" element={<ProtectedRoute role="librarian"><AdminBookingsPage /></ProtectedRoute>} />
       </Routes>
     </>
   );

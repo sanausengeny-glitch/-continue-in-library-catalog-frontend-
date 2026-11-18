@@ -514,10 +514,118 @@ img {
   font-weight: 600;
 }
 
+.reading-list__actions {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+}
+
+.reading-list__login {
+  color: #8fb2ff;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.reading-list__actions button:disabled,
+.admin-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.admin-panel {
+  margin: 0 0 24px;
+  padding: 22px;
+  background: rgba(13, 21, 30, 0.82);
+  border: 1px solid rgba(167, 180, 255, 0.14);
+  border-radius: 18px;
+}
+
+.admin-panel h2 {
+  margin: 0 0 18px;
+}
+
+.admin-book-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-book-form .field-group input,
+.admin-book-form .field-group select,
+.admin-book-form .field-group textarea,
+.admin-table select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(167, 180, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(17, 27, 40, 0.9);
+  color: #f5f7ff;
+}
+
+.admin-book-form textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.admin-form-actions {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.secondary-button,
+.danger-button {
+  padding: 8px 12px;
+  border: 1px solid rgba(167, 180, 255, 0.2);
+  border-radius: 999px;
+  color: #edf3ff;
+  background: rgba(17, 27, 40, 0.85);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.danger-button {
+  color: #ffd5d5;
+  border-color: rgba(255, 120, 120, 0.35);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(167, 180, 255, 0.14);
+  vertical-align: middle;
+}
+
+.admin-table th {
+  color: #aac8ff;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
 @media (max-width: 700px) {
   .page-shell {
     padding-left: 14px;
     padding-right: 14px;
+  }
+
+  .admin-book-form {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .site-nav {

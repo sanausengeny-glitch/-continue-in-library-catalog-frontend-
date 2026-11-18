@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { apiRequest } from '../lib/api';
 
 const spaces = [
   'Main Reading Room',
@@ -15,16 +16,32 @@ export default function BookingForm() {
     startTime: '',
     endTime: '',
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setMessage('');
+    setError('');
+
+    try {
+      await apiRequest('/api/bookings', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
+      setMessage('Your space booking has been confirmed.');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -56,13 +73,12 @@ export default function BookingForm() {
         </div>
       </div>
 
-      <button type="submit" className="primary-button">Reserve space</button>
+      <button type="submit" className="primary-button" disabled={submitting}>
+        {submitting ? 'Submitting…' : 'Reserve space'}
+      </button>
 
-      {submitted && (
-        <p className="booking-success">
-          Booking draft saved locally for {formData.space || 'your selected space'} on {formData.date || 'your chosen date'}.
-        </p>
-      )}
+      {message && <p className="booking-success" role="status">{message}</p>}
+      {error && <p className="form-error" role="alert">{error}</p>}
     </form>
   );
 }
